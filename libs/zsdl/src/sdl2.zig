@@ -213,6 +213,10 @@ pub const Window = opaque {
     }
     extern fn SDL_GetWindowSize(window: *Window, w: ?*i32, h: ?*i32) i32;
 
+    pub inline fn getID(window: *Window) WindowId
+    { return SDL_GetWindowID(window); }
+    extern fn SDL_GetWindowID(window: *Window) WindowId;
+
     pub fn setTitle(window: *Window, title: [:0]const u8) void {
         SDL_SetWindowTitle(window, title);
     }
