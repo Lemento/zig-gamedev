@@ -1351,7 +1351,7 @@ pub inline fn sqrt(v: anytype) @TypeOf(v) {
 }
 
 pub inline fn abs(v: anytype) @TypeOf(v) {
-    return @abs(v); // load, andps
+    return std.math.absCast(v); // load, andps
 }
 
 pub inline fn select(mask: anytype, v0: anytype, v1: anytype) @TypeOf(v0, v1) {
@@ -3624,7 +3624,7 @@ test "zmath.sincos32" {
 }
 
 fn asin32(v: f32) f32 {
-    const x = @abs(v);
+    const x = std.math.absCast(v);
     var omx = 1.0 - x;
     if (omx < 0.0) {
         omx = 0.0;
@@ -3678,7 +3678,7 @@ test "zmath.asin32" {
 }
 
 fn acos32(v: f32) f32 {
-    const x = @abs(v);
+    const x = std.math.absCast(v);
     var omx = 1.0 - x;
     if (omx < 0.0) {
         omx = 0.0;
@@ -3733,7 +3733,7 @@ test "zmath.acos32" {
 
 pub fn modAngle32(in_angle: f32) f32 {
     const angle = in_angle + math.pi;
-    var temp: f32 = @abs(angle);
+    var temp: f32 = std.math.absCast(angle);
     temp = temp - (2.0 * math.pi * @as(f32, @floatFromInt(@as(i32, @intFromFloat(temp / math.pi)))));
     temp = temp - math.pi;
     if (angle < 0.0) {

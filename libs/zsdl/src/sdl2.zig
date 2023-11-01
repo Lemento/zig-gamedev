@@ -196,6 +196,9 @@ pub const Window = opaque {
     pub const destroy = SDL_DestroyWindow;
     extern fn SDL_DestroyWindow(window: *Window) void;
 
+    pub const show = SDL_ShowWindow;
+    extern fn SDL_ShowWindow( window: *Window ) void;
+
     pub fn getDisplayMode(window: *Window) Error!DisplayMode {
         var mode: DisplayMode = undefined;
         if (SDL_GetWindowDisplayMode(window, &mode) < 0) return makeError();
@@ -241,7 +244,7 @@ extern fn SDL_GetVideoDriver(index: c_int) ?[*:0]const u8;
 pub const gl = struct {
     pub const Context = *anyopaque;
 
-    pub const FunctionPointer = ?*const anyopaque;
+    pub const FunctionPointer = ?*anyopaque;
 
     pub const Attr = enum(i32) {
         red_size,
@@ -321,10 +324,10 @@ pub const gl = struct {
     pub const swapWindow = SDL_GL_SwapWindow;
     extern fn SDL_GL_SwapWindow(window: *Window) void;
 
-    pub fn getProcAddress(proc: [:0]const u8) FunctionPointer {
+    pub fn getProcAddress(proc: [*c]const u8) callconv(.C) FunctionPointer {
         return SDL_GL_GetProcAddress(proc);
     }
-    extern fn SDL_GL_GetProcAddress(proc: ?[*:0]const u8) FunctionPointer;
+    extern fn SDL_GL_GetProcAddress(proc: [*c]const u8) callconv(.C) FunctionPointer;
 
     pub fn isExtensionSupported(extension: [:0]const u8) bool {
         return SDL_GL_ExtensionSupported(extension) == True;
@@ -942,14 +945,54 @@ pub const FPoint = extern struct {
 // Surface Creation and Simple Drawing
 //
 //--------------------------------------------------------------------------------------------------
-pub const Surface = opaque {
+const SDL_Palette = extern struct {
+    ncolors: i32,
+    colors: [*]Color,
+    version: u32,
+    refcount: i32,
+};
+const SDL_PixelFormat = extern struct {
+    format: u32,
+    palette: ?*SDL_Palette,
+    BitsPerPixel: u8,
+    BytesPerPixel: u8,
+    padding: [2]u8,
+    Rmask: u32,
+    Gmask: u32,
+    Bmask: u32,
+    Amask: u32,
+    Rloss: u8,
+    Gloss: u8,
+    Bloss: u8,
+    Aloss: u8,
+    Rshift: u8,
+    Gshift: u8,
+    Bshift: u8,
+    Ashift: u8,
+    refcount: c_int,
+    next: ?*SDL_PixelFormat,
+};
+const SDL_BlitMap = opaque{};
+pub const Surface = extern struct {
+    flags: u32,
+    format: *SDL_PixelFormat,
+    w: i32,
+    h: i32,
+    pitch: i32,
+    pixels: *anyopaque,
+    userdata: *anyopaque,
+    locked: i32,
+    lock_data: *anyopaque,
+    clip_rect: Rect,
+    map: *SDL_BlitMap,
+    refcount: i32,
+
     pub fn free(surface: *Surface) void {
         SDL_FreeSurface(surface);
     }
     extern fn SDL_FreeSurface(surface: *Surface) void;
 };
 
-//--------------------------------------------------------------------------------------------------
 //
 // Platform-specific Window Management
 //
