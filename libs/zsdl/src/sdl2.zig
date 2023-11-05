@@ -241,6 +241,13 @@ pub fn getVideoDriver(index: u16) ?[:0]const u8 {
 }
 extern fn SDL_GetVideoDriver(index: c_int) ?[*:0]const u8;
 
+/// Get the number of milliseconds since SDL library initialization.
+/// 
+/// Returns an unsigned 64-bit value representing the number of milliseconds since the SDL library initialized.
+pub inline fn getTicks() u64
+{ return SDL_GetTicks64(); }
+extern fn SDL_GetTicks64() u64;
+
 pub const gl = struct {
     pub const Context = *anyopaque;
 
